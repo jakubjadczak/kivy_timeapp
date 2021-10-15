@@ -1,0 +1,170 @@
+<Timer>:
+    BoxLayout_1:
+        orientation: 'vertical'
+        spacing: 5
+        padding: 10
+
+        BoxLayout_1:
+            orienation: 'horizontal'
+            spacing: 5
+            padding: 10
+            Label:
+                text: '0'
+                id: hours_l
+                font_size: 70
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                color: 31/255, 58/255, 147/255, 1
+            Label:
+                text: '0'
+                id: min_l
+                font_size: 70
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                color: 31/255, 58/255, 147/255, 1
+            Label:
+                text: '0'
+                id: sec_l
+                font_size: 70
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                color: 31/255, 58/255, 147/255, 1
+            Label:
+                text: '0'
+                id: micro_sec_l
+                font_size: 70
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                color: 31/255, 58/255, 147/255, 1
+
+        BoxLayout_1:
+            size_hint: .8, .6
+            pos_hint: {'center_x': .5}
+            spacing: 5
+            padding: 10
+            orientation: 'horizontal'
+            Button:
+                background_color: (0, 0, 0, 0)
+                text: 'Start'
+                font_size: 20
+                canvas.before:
+                    Color:
+                        rgba: 31/255, 58/255, 147/255, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [60,]
+                disabled: root.start_disabled
+                on_press: root.start_button()
+
+            Button:
+                background_color: (0, 0, 0, 0)
+                text: 'Stop'
+                font_size: 20
+                canvas.before:
+                    Color:
+                        rgba: 31/255, 58/255, 147/255, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [60,]
+                disabled: root.stop_disabled
+                on_press: root.stop_button()
+
+        BoxLayout_1:
+            spacing: 5
+            padding: 10
+            size_hint: 1, .4
+            orientation: 'horizontal'
+            Button:
+                background_color: (0, 0, 0, 0)
+                text: 'Minutnik'
+                font_size: 20
+                canvas.before:
+                    Color:
+                        rgba: 31/255, 58/255, 147/255, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [30,]
+                on_press:
+                    root.manager.current = 'time_counter'
+                    root.manager.transition.direction = 'left'
+
+            Button:
+                background_color: (0, 0, 0, 0)
+                text: 'Tabela czasów'
+                font_size: 20
+                canvas.before:
+                    Color:
+                        rgba: 31/255, 58/255, 147/255, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [30,]
+                # on_press: root.click()
+            Button:
+                background_color: (0, 0, 0, 0)
+                text: 'Zapisz'
+                font_size: 20
+                canvas.before:
+                    Color:
+                        rgba: 31/255, 58/255, 147/255, 1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [30,]
+                disabled: root.save_disabled
+
+<TimeCounter>:
+    BoxLayout_1:
+        spacing: 55
+        padding: 5
+        orientation: 'horizontal'
+        size_hint: .5, .15
+        pos_hint: {'center_x': .4, 'center_y': .7}
+
+        Button:
+            background_color: (0, 0, 0, 0)
+            on_press: root.click()
+            Image:
+                source: 'kivy.up.png'
+                center_x: self.parent.center_x
+                center_y: self.parent.center_y
+
+        Button:
+            background_color: (0, 0, 0, 0)
+            on_press: root.click()
+            Image:
+                source: 'kivy.up.png'
+                center_x: self.parent.center_x
+                center_y: self.parent.center_y
+
+        Button:
+            background_color: (0, 0, 0, 0)
+            on_press: root.click()
+            Image:
+                source: 'kivy.up.png'
+                center_x: self.parent.center_x
+                center_y: self.parent.center_y
+
+    BoxLayout_1:
+        spacing: 55
+        padding: 5
+        orientation: 'horizontal'
+        size_hint: .5, .6
+        pos_hint: {'center_x': .4, 'center_y': .5}
+
+        Label:
+            text: '0'
+            id: hours_set
+            font_size: 70
+            color: 31/255, 58/255, 147/255, 1
+
+        Label:
+            text: '0'
+            id: minutes_set
+            font_size: 70
+            color: 31/255, 58/255, 147/255, 1
+
+        Label:
+            text: '0'
+            id: sec_set
+            font_size: 70
+            color: 31/255, 58/255, 147/255, 1
