@@ -169,7 +169,7 @@
                     pos: self.pos
                     size: self.size
                     radius: [30,]
-            #on_press: root.reset_button()
+            on_press: root.save_button()
 
 
 <EndPopup>:
@@ -400,3 +400,51 @@
                     size: self.size
                     radius: [30,]
             on_press: root.reset_button()
+
+
+<SelectableButton>:
+    background_color: (0, 0, 0, 0)
+    background_normal: ''
+    font_size: 20
+    canvas.before:
+        Color:
+            rgba: 31/255, 58/255, 147/255, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [30,]
+
+
+<RV>:
+    viewclass: 'SelectableButton'
+    SelectableRecycleBoxLayout:
+        spacing: 5
+        default_size: None, dp(56)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: True
+        touch_multiselect: True
+
+<RVTimeTable>:
+    BoxLayout:
+        spacing: 2.5
+        padding: 5
+        orientation: "vertical"
+        RV:
+        Button:
+            background_color: (0, 0, 0, 0)
+            text: 'Stoper'
+            font_size: 20
+            canvas.before:
+                Color:
+                    rgba: 31/255, 58/255, 147/255, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [30,]
+            size_hint: None, None
+            size: 200, 50
+            pos_hint: {'center_x': .5}
+            on_press: root.manager.current = 'timer'
