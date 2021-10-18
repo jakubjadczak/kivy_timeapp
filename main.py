@@ -6,6 +6,14 @@ from kivy.core.window import Window
 from kivy.properties import BooleanProperty, StringProperty, ObjectProperty
 from kivy.uix.popup import Popup
 
+from kivy.uix.button import Button
+from kivy.uix.recycleview.layout import LayoutSelectionBehavior
+from kivy.uix.behaviors import FocusBehavior
+from kivy.uix.recycleboxlayout import RecycleBoxLayout
+from kivy.uix.recycleview.views import RecycleDataViewBehavior
+from database import DataBase
+from kivy.uix.recycleview import RecycleView
+
 
 class SavePopup(Popup):
     obj = ObjectProperty(None)
@@ -29,6 +37,12 @@ class SavePopup(Popup):
         self.T.append(self.micro_sec)
         self.time = ' : '.join(self.T)
         self.background_color = (255, 255, 255, 1)
+
+    def save_button(self):
+        name = self.ids.time_name.text
+        db = DataBase()
+        db.insert(name, self.hrs, self.min, self.sec, self.micro_sec)
+        self.dismiss()
 
 
 class Timer(Screen):
@@ -227,8 +241,68 @@ class TimeCounter(Screen):
         self.ids.sec_set.text = str(s)
 
 
-class TimeTable(Screen):
-    pass
+
+class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
+                                 RecycleBoxLayout):
+    """ Adds selection and focus behaviour to the view. """
+
+
+class SelectableButton(RecycleDataViewBehavior, Button):
+    """ Add selection support to the Label """
+
+    index = None
+    selected = BooleanProperty(False)
+    selectable = BooleanProperty(True)
+
+    def refresh_view_attrs(self, rv, index, data):
+        """ Catch and handle the view changes """
+        self.index = index
+        return super(SelectableButton, self).refresh_view_attrs(
+            rv, index, data)
+
+    def on_touch_down(self, touch):
+        """ Add selection on touch down """
+        if super(SelectableButton, self).on_touch_down(touch):
+            return True
+        if self.collide_point(*touch.pos) and self.selectable:
+            return self.parent.select_with_touch(self.index, touch)
+
+    def apply_selection(self, rv, index, is_selected):
+        """ Respond to the selection of items in the view. """
+        self.selected = is_selected
+
+
+    def on_press(self):
+        print('ok')
+
+    def update_changes(self, txt_p, txt_e):
+        self.see.update(self.idt, txt_p, txt_e)
+
+
+class RV(RecycleView):
+    def __init__(self, **kwargs):
+        super(RV, self).__init__(**kwargs)
+        db = DataBase()
+        self.words = db.reading_all()
+        self.set_data()
+
+    def set_data(self):
+        d = [{'text': str(self.words[i][0]) + '       ' + str(self.words[i][1]) + '      '
+                      + str(self.words[i][2]) + '  :  ' + str(self.words[i][3]) + '  :  ' + str(
+            self.words[i][4]) + '  :  ' + str(self.words[i][5])
+              } for i in range(len(self.words))]
+        self.show(d)
+
+    def show(self, d):
+        self.data = d
+        print('ok')
+
+
+class RVTimeTable(Screen):
+    def on_pre_enter(self, *args):
+        r = RV()
+        r.set_data()
+
 
 
 class BoxLayout_1(BoxLayout):
@@ -240,7 +314,7 @@ class WatchApp(App):
         sm = ScreenManager()
         sm.add_widget(Timer(name='timer'))
         sm.add_widget(TimeCounter(name='time_counter'))
-        sm.add_widget(TimeTable(name='time_table'))
+        sm.add_widget(RVTimeTable(name='time_table'))
         return sm
 
 
