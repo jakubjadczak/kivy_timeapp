@@ -5,7 +5,6 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.properties import BooleanProperty, StringProperty, ObjectProperty
 from kivy.uix.popup import Popup
-from kivy.uix.widget import Widget
 
 from kivy.uix.button import Button
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
@@ -23,6 +22,7 @@ class SavePopup(Popup):
     min = StringProperty('')
     hrs = StringProperty('')
     time = StringProperty('')
+    ui_color = StringProperty([0, 183 / 255, 135 / 255, 1])
 
     def __init__(self, obj, **kwargs):
         super(SavePopup, self).__init__(**kwargs)
@@ -31,26 +31,39 @@ class SavePopup(Popup):
         self.micro_sec = str(obj.micro_l)
         self.sec = str(obj.sec_l)
         self.min = str(obj.min_l)
-        self.hrs = str(obj.hours_l)
+        self.hrs = str(obj.hrs_l)
         self.T.append(self.hrs)
         self.T.append(self.min)
         self.T.append(self.sec)
         self.T.append(self.micro_sec)
         self.time = ' : '.join(self.T)
-        self.background_color = (255, 255, 255, 1)
+        self.background_color = (1, 1, 1, .5)
 
     def save_button(self):
         name = self.ids.time_name.text
-        db = DataBase()
-        db.insert(name, self.hrs, self.min, self.sec, self.micro_sec)
-        self.dismiss()
+        if name == '':
+            pass
+        else:
+            db = DataBase()
+            db.insert(name, self.hrs, self.min, self.sec, self.micro_sec)
+            self.dismiss()
 
 
 class Timer(Screen):
-    Window.clearcolor = (1, 1, 1, 1)
+    Window.clearcolor = (97/255, 97/255, 101/255, 1)
     stop_disabled = BooleanProperty(True)
     start_disabled = BooleanProperty(False)
     save_disabled = BooleanProperty(True)
+    ui_color = StringProperty([0, 183/255, 135/255, 1])
+    stop_reset = StringProperty('Stop')
+
+    def __init__(self):
+        super(Timer, self).__init__(name='timer')
+        self.micro_l = 0
+        self.sec_l = 0
+        self.min_l = 0
+        self.hrs_l = 0
+        self.reset = False
 
     def on_pre_enter(self, *args):
         self.stop_disabled = True
@@ -58,26 +71,40 @@ class Timer(Screen):
         self.micro_l = 0
         self.sec_l = 0
         self.min_l = 0
-        self.hours_l = 0
-
-    def reset_button(self):
-        self.stop_button()
-        self.ids.hours_l.text = '0'
+        self.hrs_l = 0
+        self.ids.hrs_l.text = '0'
         self.ids.min_l.text = '0'
         self.ids.sec_l.text = '0'
         self.ids.micro_sec_l.text = '0'
+        self.reset = False
+
+    def reset_button(self):
+        self.save_disabled = True
+        self.ids.hrs_l.text = '0'
+        self.ids.min_l.text = '0'
+        self.ids.sec_l.text = '0'
+        self.ids.micro_sec_l.text = '0'
+        self.micro_l = 0
+        self.sec_l = 0
+        self.min_l = 0
+        self.hrs_l = 0
 
     def start_button(self):
         self.stop_disabled = False
         self.start_disabled = True
         self.save_disabled = True
+        self.stop_reset = 'Stop'
+        self.reset = False
         self.micro_sec_event = Clock.schedule_interval(self.micro_sec, 0.01)
-
 
     def stop_button(self):
         self.start_disabled = False
-        self.stop_disabled = True
+        self.stop_disabled = False
         self.save_disabled = False
+        self.stop_reset = 'Reset'
+        if (self.micro_l > 0 or self.sec_l > 0 or self.min_l > 0 or self.hrs_l > 0) and self.reset:
+            self.reset_button()
+        self.reset = True
         Clock.unschedule(self.micro_sec_event)
 
     def save_button(self):
@@ -91,33 +118,33 @@ class Timer(Screen):
             self.sec()
             self.micro_l = 0
 
-    def sec(self, *args):
+    def sec(self):
         self.sec_l += 1
         self.ids.sec_l.text = str(self.sec_l)
         if self.sec_l == 59:
             self.minute()
             self.sec_l = 0
 
-    def minute(self, *args):
+    def minute(self):
         self.min_l += 1
         self.ids.min_l.text = str(self.min_l)
         if self.min_l == 60:
             self.hours()
             self.min_l = 0
 
-    def hours(self, *args):
-        self.hours_l += 1
-        self.ids.hours_l.text = str(self.hours_l)
+    def hours(self):
+        self.hrs_l += 1
+        self.ids.hrs_l.text = str(self.hrs_l)
 
 
 class EndPopup(Popup):
     def __init__(self):
         super().__init__()
-        self.background_color = (255, 255, 255, 1)
+        self.background_color = (1, 1, 1, .5)
         self.micro_l = 0
         self.sec_l = 0
         self.min_l = 0
-        self.hours_l = 0
+        self.hrs_l = 0
         self.event = Clock.schedule_interval(self.micro_sec, 0.01)
 
     def ok_button(self):
@@ -130,29 +157,36 @@ class EndPopup(Popup):
             self.sec()
             self.micro_l = 0
 
-    def sec(self, *args):
+    def sec(self):
         self.sec_l += 1
         self.ids.sec_l.text = str(self.sec_l)
         if self.sec_l == 59:
             self.minute()
             self.sec_l = 0
 
-    def minute(self, *args):
+    def minute(self):
         self.min_l += 1
         self.ids.min_l.text = str(self.min_l)
         if self.min_l == 60:
             self.hours()
             self.min_l = 0
 
-    def hours(self, *args):
-        self.hours_l += 1
-        self.ids.hours_l.text = str(self.hours_l)
+    def hours(self):
+        self.hrs_l += 1
+        self.ids.hrs_l.text = str(self.hrs_l)
 
 
 class TimeCounter(Screen):
     stop_disabled = BooleanProperty(True)
     start_disabled = BooleanProperty(False)
     save_disabled = BooleanProperty(True)
+    ui_color = StringProperty([0, 183/255, 135/255, 1])
+
+    def __init__(self):
+        super(TimeCounter, self).__init__(name='time_counter')
+        self.hrs = 0
+        self.min = 0
+        self.sec = 0
 
     def on_pre_enter(self, *args):
         self.stop_disabled = True
@@ -160,27 +194,26 @@ class TimeCounter(Screen):
     def start_button(self):
         self.start_disabled = True
         self.stop_disabled = False
-        self.h = int(self.ids.hours_set.text)
-        self.m = int(self.ids.min_set.text)
-        self.s = int(self.ids.sec_set.text)
+        self.hrs = int(self.ids.hrs_set.text)
+        self.min = int(self.ids.min_set.text)
+        self.sec = int(self.ids.sec_set.text)
         self.event = Clock.schedule_interval(self.count_down, 1)
 
     def count_down(self, *args):
+        if self.sec > 0:
+            self.sec -= 1
+        elif self.min > 0:
+            self.min -= 1
+            self.sec = 59
+        elif self.hrs > 0:
+            self.min = 60
+            self.hrs -= 1
 
-        if self.s > 0:
-            self.s -= 1
-        elif self.m > 0:
-            self.m -= 1
-            self.s = 59
-        elif self.h > 0:
-            self.m = 60
-            self.h -= 1
+        self.ids.hrs_set.text = str(self.hrs)
+        self.ids.min_set.text = str(self.min)
+        self.ids.sec_set.text = str(self.sec)
 
-        self.ids.hours_set.text = str(self.h)
-        self.ids.min_set.text = str(self.m)
-        self.ids.sec_set.text = str(self.s)
-
-        if self.s == 0 and self.m == 0 and self.h == 0:
+        if self.sec == 0 and self.min == 0 and self.hrs == 0:
             self.stop_button()
             self.time_end()
 
@@ -196,14 +229,14 @@ class TimeCounter(Screen):
 
     def reset_button(self):
         self.stop_button()
-        self.ids.hours_set.text = '0'
+        self.ids.hrs_set.text = '0'
         self.ids.min_set.text = '0'
         self.ids.sec_set.text = '0'
 
     def hour_up(self):
-        h = self.ids.hours_set.text
+        h = self.ids.hrs_set.text
         h = int(h) + 1
-        self.ids.hours_set.text = str(h)
+        self.ids.hrs_set.text = str(h)
 
     def min_up(self):
         m = self.ids.min_set.text
@@ -224,10 +257,10 @@ class TimeCounter(Screen):
             self.ids.sec_set.text = str(s)
 
     def hours_down(self):
-        h = self.ids.hours_set.text
+        h = self.ids.hrs_set.text
         if h != '0':
             h = int(h) - 1
-        self.ids.hours_set.text = str(h)
+        self.ids.hrs_set.text = str(h)
 
     def min_down(self):
         m = self.ids.min_set.text
@@ -252,12 +285,13 @@ class EditPopup(Popup):
     name = StringProperty('')
     time_name = StringProperty('')
     idt = StringProperty('')
+    ui_color = StringProperty([0, 183/255, 135/255, 1])
 
     def __init__(self, obj, **kwargs):
         super(EditPopup, self).__init__(**kwargs)
         self.obj = obj
         self.name = obj.text
-        self.background_color = (255, 255, 255, 1)
+        self.background_color = (1, 1, 1, .5)
         print(type(self.name), self.name)
         T = self.name.split()
         for t in T:
@@ -267,13 +301,13 @@ class EditPopup(Popup):
         self.idt = T[0]
 
 
-
 class SelectableButton(RecycleDataViewBehavior, Button):
     """ Add selection support to the Label """
 
     index = None
     selected = BooleanProperty(False)
     selectable = BooleanProperty(True)
+    ui_color = StringProperty([0, 183/255, 135/255, 1])
 
     def refresh_view_attrs(self, rv, index, data):
         """ Catch and handle the view changes """
@@ -294,17 +328,26 @@ class SelectableButton(RecycleDataViewBehavior, Button):
 
     def on_press(self):
         popup = EditPopup(self)
-        print(popup.name)
-        print(popup.time_name, popup.idt)
+        self.idt = popup.idt
         popup.open()
 
-    def update_changes(self, idt, name):
-        pass
+    def update_changes(self, name):
+        db = DataBase()
+        db.edit_by_id(self.idt, name)
+        print(self.idt, name)
+
+    def delete(self):
+        db = DataBase()
+        db.delete_by_id(self.idt)
+        self.text = ''
 
 
 class RV(RecycleView, Screen):
+    ui_color = StringProperty([0, 183/255, 135/255, 1])
+
     def __init__(self, **kwargs):
         super(RV, self).__init__(**kwargs)
+        self.words = []
 
     def set_data(self):
         db = DataBase()
@@ -320,11 +363,6 @@ class RV(RecycleView, Screen):
         self.ids.rv_view.refresh_from_data()
 
 
-class RVTimeTable(Screen):
-    pass
-
-
-
 class BoxLayout_1(BoxLayout):
     pass
 
@@ -332,8 +370,8 @@ class BoxLayout_1(BoxLayout):
 class WatchApp(App):
     def build(self):
         sm = ScreenManager()
-        sm.add_widget(Timer(name='timer'))
-        sm.add_widget(TimeCounter(name='time_counter'))
+        sm.add_widget(Timer())
+        sm.add_widget(TimeCounter())
         sm.add_widget(RV(name='time_table'))
         return sm
 
