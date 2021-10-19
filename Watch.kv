@@ -416,23 +416,23 @@
 
 
 <RV>:
-    viewclass: 'SelectableButton'
-    SelectableRecycleBoxLayout:
-        spacing: 5
-        default_size: None, dp(56)
-        default_size_hint: 1, None
-        size_hint_y: None
-        height: self.minimum_height
+    on_pre_enter: self.refresh_view()
+    BoxLayout_1:
         orientation: 'vertical'
-        multiselect: True
-        touch_multiselect: True
-
-<RVTimeTable>:
-    BoxLayout:
-        spacing: 2.5
-        padding: 5
-        orientation: "vertical"
-        RV:
+        spacing: 5
+        RecycleView:
+            id: rv_view
+            data: root.set_data()
+            viewclass: 'SelectableButton'
+            SelectableRecycleBoxLayout:
+                spacing: 5
+                default_size: None, dp(56)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+                multiselect: True
+                touch_multiselect: True
         Button:
             background_color: (0, 0, 0, 0)
             text: 'Stoper'
@@ -448,3 +448,42 @@
             size: 200, 50
             pos_hint: {'center_x': .5}
             on_press: root.manager.current = 'timer'
+
+
+<EditPopup>:
+    title: ''
+    size_hint: None, None
+    size: 400, 400
+    auto_dismiss: True
+    BoxLayout_1:
+        orientation: 'vertical'
+        spacing: 10
+
+        TextInput:
+            id: change_name_input
+            text: root.time_name
+
+        Button:
+            background_color: (0, 0, 0, 0)
+            text: 'Zapisz'
+            font_size: 20
+            canvas.before:
+                Color:
+                    rgba: 31/255, 58/255, 147/255, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [30,]
+            on_press: root.upd
+
+        Button:
+            background_color: (0, 0, 0, 0)
+            text: 'Usuń'
+            font_size: 20
+            canvas.before:
+                Color:
+                    rgba: 31/255, 58/255, 147/255, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [30,]
