@@ -5,6 +5,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.properties import BooleanProperty, StringProperty, ObjectProperty
 from kivy.uix.popup import Popup
+from kivy.uix.widget import Widget
 
 from kivy.uix.button import Button
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
@@ -241,10 +242,30 @@ class TimeCounter(Screen):
         self.ids.sec_set.text = str(s)
 
 
-
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
                                  RecycleBoxLayout):
     """ Adds selection and focus behaviour to the view. """
+
+
+class EditPopup(Popup):
+    obj = ObjectProperty(None)
+    name = StringProperty('')
+    time_name = StringProperty('')
+    idt = StringProperty('')
+
+    def __init__(self, obj, **kwargs):
+        super(EditPopup, self).__init__(**kwargs)
+        self.obj = obj
+        self.name = obj.text
+        self.background_color = (255, 255, 255, 1)
+        print(type(self.name), self.name)
+        T = self.name.split()
+        for t in T:
+            if t == ':':
+                T.remove(t)
+        self.time_name = T[1]
+        self.idt = T[0]
+
 
 
 class SelectableButton(RecycleDataViewBehavior, Button):
@@ -271,37 +292,36 @@ class SelectableButton(RecycleDataViewBehavior, Button):
         """ Respond to the selection of items in the view. """
         self.selected = is_selected
 
-
     def on_press(self):
-        print('ok')
+        popup = EditPopup(self)
+        print(popup.name)
+        print(popup.time_name, popup.idt)
+        popup.open()
 
-    def update_changes(self, txt_p, txt_e):
-        self.see.update(self.idt, txt_p, txt_e)
+    def update_changes(self, idt, name):
+        pass
 
 
-class RV(RecycleView):
+class RV(RecycleView, Screen):
     def __init__(self, **kwargs):
         super(RV, self).__init__(**kwargs)
-        db = DataBase()
-        self.words = db.reading_all()
-        self.set_data()
 
     def set_data(self):
+        db = DataBase()
+        self.words = db.reading_all()
         d = [{'text': str(self.words[i][0]) + '       ' + str(self.words[i][1]) + '      '
                       + str(self.words[i][2]) + '  :  ' + str(self.words[i][3]) + '  :  ' + str(
             self.words[i][4]) + '  :  ' + str(self.words[i][5])
               } for i in range(len(self.words))]
-        self.show(d)
+        return d
 
-    def show(self, d):
-        self.data = d
-        print('ok')
+    def refresh_view(self):
+        self.ids.rv_view.data = self.set_data()
+        self.ids.rv_view.refresh_from_data()
 
 
 class RVTimeTable(Screen):
-    def on_pre_enter(self, *args):
-        r = RV()
-        r.set_data()
+    pass
 
 
 
@@ -314,7 +334,7 @@ class WatchApp(App):
         sm = ScreenManager()
         sm.add_widget(Timer(name='timer'))
         sm.add_widget(TimeCounter(name='time_counter'))
-        sm.add_widget(RVTimeTable(name='time_table'))
+        sm.add_widget(RV(name='time_table'))
         return sm
 
 
