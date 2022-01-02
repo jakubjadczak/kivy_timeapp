@@ -5,7 +5,6 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.properties import BooleanProperty, StringProperty, ObjectProperty
 from kivy.uix.popup import Popup
-
 from kivy.uix.button import Button
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.behaviors import FocusBehavior
@@ -16,13 +15,16 @@ from kivy.uix.recycleview import RecycleView
 
 
 class SavePopup(Popup):
+    """
+    Class displaying popup window and saving time with title in db
+    after clicking save button
+    """
     obj = ObjectProperty(None)
     micro_sec = StringProperty('')
     sec = StringProperty('')
     min = StringProperty('')
     hrs = StringProperty('')
     time = StringProperty('')
-    ui_color = StringProperty([0, 183 / 255, 135 / 255, 1])
 
     def __init__(self, obj, **kwargs):
         super(SavePopup, self).__init__(**kwargs)
@@ -40,6 +42,10 @@ class SavePopup(Popup):
         self.background_color = (1, 1, 1, .5)
 
     def save_button(self):
+        """
+        Run after click save button
+        :return: new row in database
+        """
         name = self.ids.time_name.text
         if name == '':
             pass
@@ -50,11 +56,13 @@ class SavePopup(Popup):
 
 
 class Timer(Screen):
+    """
+    First window, time measuring
+    """
     Window.clearcolor = (97/255, 97/255, 101/255, 1)
     stop_disabled = BooleanProperty(True)
     start_disabled = BooleanProperty(False)
     save_disabled = BooleanProperty(True)
-    ui_color = StringProperty([0, 183/255, 135/255, 1])
     stop_reset = StringProperty('Stop')
 
     def __init__(self):
@@ -112,6 +120,11 @@ class Timer(Screen):
         popup.open()
 
     def micro_sec(self, *args):
+        """
+        Function calls for 0.01 sec from 'start_button', running 'sec'
+        :param args:
+        :return:
+        """
         self.micro_l += 1
         self.ids.micro_sec_l.text = str(self.micro_l)
         if self.micro_l == 99:
@@ -138,6 +151,10 @@ class Timer(Screen):
 
 
 class EndPopup(Popup):
+    """
+    Popup displaying when time's up, class count time since time is over
+    this time is displaying in this popup, user can stop counting clicking button
+    """
     def __init__(self):
         super().__init__()
         self.background_color = (1, 1, 1, .5)
@@ -177,10 +194,13 @@ class EndPopup(Popup):
 
 
 class TimeCounter(Screen):
+    """
+    Window, setting time and countdown after click start button
+    """
+    reset_akt = BooleanProperty(True)
     stop_disabled = BooleanProperty(True)
     start_disabled = BooleanProperty(False)
     save_disabled = BooleanProperty(True)
-    ui_color = StringProperty([0, 183/255, 135/255, 1])
 
     def __init__(self):
         super(TimeCounter, self).__init__(name='time_counter')
@@ -190,10 +210,12 @@ class TimeCounter(Screen):
 
     def on_pre_enter(self, *args):
         self.stop_disabled = True
+        self.reset_akt = True
 
     def start_button(self):
         self.start_disabled = True
         self.stop_disabled = False
+        self.reset_akt = True
         self.hrs = int(self.ids.hrs_set.text)
         self.min = int(self.ids.min_set.text)
         self.sec = int(self.ids.sec_set.text)
@@ -217,7 +239,8 @@ class TimeCounter(Screen):
             self.stop_button()
             self.time_end()
 
-    def time_end(self):
+    @staticmethod
+    def time_end():
         popup = EndPopup()
         popup.open()
 
@@ -226,14 +249,19 @@ class TimeCounter(Screen):
         self.stop_disabled = True
         self.start_disabled = False
         self.save_disabled = False
+        self.reset_akt = False
 
     def reset_button(self):
         self.stop_button()
+        self.reset_akt = True
         self.ids.hrs_set.text = '0'
         self.ids.min_set.text = '0'
         self.ids.sec_set.text = '0'
 
     def hour_up(self):
+        """
+        Functions used to setting time by user on app's screen
+        """
         h = self.ids.hrs_set.text
         h = int(h) + 1
         self.ids.hrs_set.text = str(h)
@@ -275,24 +303,20 @@ class TimeCounter(Screen):
         self.ids.sec_set.text = str(s)
 
 
-class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
-                                 RecycleBoxLayout):
-    """ Adds selection and focus behaviour to the view. """
-
-
 class EditPopup(Popup):
+    """
+    Popup displaying after clicking on row, user can edit only the title
+    """
     obj = ObjectProperty(None)
     name = StringProperty('')
     time_name = StringProperty('')
     idt = StringProperty('')
-    ui_color = StringProperty([0, 183/255, 135/255, 1])
 
     def __init__(self, obj, **kwargs):
         super(EditPopup, self).__init__(**kwargs)
         self.obj = obj
         self.name = obj.text
         self.background_color = (1, 1, 1, .5)
-        print(type(self.name), self.name)
         T = self.name.split()
         for t in T:
             if t == ':':
@@ -301,13 +325,22 @@ class EditPopup(Popup):
         self.idt = T[0]
 
 
+"""
+Classes below are taking part in Recycle View
+"""
+
+
+class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
+                                 RecycleBoxLayout):
+    """ Adds selection and focus behaviour to the view. """
+
+
 class SelectableButton(RecycleDataViewBehavior, Button):
     """ Add selection support to the Label """
 
     index = None
     selected = BooleanProperty(False)
     selectable = BooleanProperty(True)
-    ui_color = StringProperty([0, 183/255, 135/255, 1])
 
     def refresh_view_attrs(self, rv, index, data):
         """ Catch and handle the view changes """
@@ -334,7 +367,8 @@ class SelectableButton(RecycleDataViewBehavior, Button):
     def update_changes(self, name):
         db = DataBase()
         db.edit_by_id(self.idt, name)
-        print(self.idt, name)
+        self.text = db.reading_one(self.idt)
+        # print(self.idt, name)
 
     def delete(self):
         db = DataBase()
@@ -343,7 +377,6 @@ class SelectableButton(RecycleDataViewBehavior, Button):
 
 
 class RV(RecycleView, Screen):
-    ui_color = StringProperty([0, 183/255, 135/255, 1])
 
     def __init__(self, **kwargs):
         super(RV, self).__init__(**kwargs)
@@ -353,7 +386,7 @@ class RV(RecycleView, Screen):
         db = DataBase()
         self.words = db.reading_all()
         d = [{'text': str(self.words[i][0]) + '       ' + str(self.words[i][1]) + '      '
-                      + str(self.words[i][2]) + '  :  ' + str(self.words[i][3]) + '  :  ' + str(
+              + str(self.words[i][2]) + '  :  ' + str(self.words[i][3]) + '  :  ' + str(
             self.words[i][4]) + '  :  ' + str(self.words[i][5])
               } for i in range(len(self.words))]
         return d
@@ -368,6 +401,8 @@ class BoxLayout_1(BoxLayout):
 
 
 class WatchApp(App):
+    ui_color = StringProperty([0, 183 / 255, 135 / 255, 1])
+
     def build(self):
         sm = ScreenManager()
         sm.add_widget(Timer())
@@ -378,8 +413,3 @@ class WatchApp(App):
 
 if __name__ == '__main__':
     WatchApp().run()
-
-
-
-
-

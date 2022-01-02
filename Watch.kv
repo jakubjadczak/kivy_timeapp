@@ -13,25 +13,25 @@
                 id: hrs_l
                 font_size: 100
                 pos_hint: {'center_x': .5, 'center_y': .5}
-                color: root.ui_color
+                color: app.ui_color
             Label:
                 text: '0'
                 id: min_l
                 font_size: 100
                 pos_hint: {'center_x': .5, 'center_y': .5}
-                color: root.ui_color
+                color: app.ui_color
             Label:
                 text: '0'
                 id: sec_l
                 font_size: 100
                 pos_hint: {'center_x': .5, 'center_y': .5}
-                color: root.ui_color
+                color: app.ui_color
             Label:
                 text: '0'
                 id: micro_sec_l
                 font_size: 50
                 pos_hint: {'center_x': .5, 'center_y': .5}
-                color: root.ui_color
+                color: app.ui_color
 
         BoxLayout_1:
             size_hint: .8, .6
@@ -45,7 +45,7 @@
                 font_size: 50
                 canvas.before:
                     Color:
-                        rgba: root.ui_color
+                        rgba: app.ui_color
                     RoundedRectangle:
                         pos: self.pos
                         size: self.size
@@ -59,7 +59,7 @@
                 font_size: 50
                 canvas.before:
                     Color:
-                        rgba: root.ui_color
+                        rgba: app.ui_color
                     RoundedRectangle:
                         pos: self.pos
                         size: self.size
@@ -78,7 +78,7 @@
                 font_size: 30
                 canvas.before:
                     Color:
-                        rgba: root.ui_color
+                        rgba: app.ui_color
                     RoundedRectangle:
                         pos: self.pos
                         size: self.size
@@ -93,7 +93,7 @@
                 font_size: 30
                 canvas.before:
                     Color:
-                        rgba: root.ui_color
+                        rgba: app.ui_color
                     RoundedRectangle:
                         pos: self.pos
                         size: self.size
@@ -108,7 +108,7 @@
                 font_size: 30
                 canvas.before:
                     Color:
-                        rgba: root.ui_color
+                        rgba: app.ui_color
                     RoundedRectangle:
                         pos: self.pos
                         size: self.size
@@ -132,22 +132,22 @@
         Label:
             text: root.time
             font_size: 60
-            color: root.ui_color
+            color: app.ui_color
 
         Label:
             text: 'Podaj nazwe '
             font_size: 30
-            color: root.ui_color
+            color: app.ui_color
 
         TextInput:
             focus: True
             size_hint: 1, .5
             font_size: 30
-            cursor_color: root.ui_color
+            cursor_color: app.ui_color
             id: time_name
             multiline: False
             background_color: (97/255, 97/255, 101/255, .6)
-            on_text: self.foreground_color = root.ui_color
+            on_text: self.foreground_color = app.ui_color
 
         Button:
             background_color: (0, 0, 0, 0)
@@ -155,7 +155,7 @@
             font_size: 20
             canvas.before:
                 Color:
-                    rgba: root.ui_color
+                    rgba: app.ui_color
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
@@ -264,19 +264,19 @@
             text: '0'
             id: hrs_set
             font_size: 70
-            color: root.ui_color
+            color: app.ui_color
 
         Label:
             text: '0'
             id: min_set
             font_size: 70
-            color: root.ui_color
+            color: app.ui_color
 
         Label:
             text: '0'
             id: sec_set
             font_size: 70
-            color: root.ui_color
+            color: app.ui_color
 
 
     BoxLayout_1:
@@ -322,7 +322,7 @@
             font_size: 50
             canvas.before:
                 Color:
-                    rgba: root.ui_color
+                    rgba: app.ui_color
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
@@ -336,7 +336,7 @@
             font_size: 50
             canvas.before:
                 Color:
-                    rgba: root.ui_color
+                    rgba: app.ui_color
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
@@ -357,7 +357,7 @@
             font_size: 30
             canvas.before:
                 Color:
-                    rgba: root.ui_color
+                    rgba: app.ui_color
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
@@ -372,7 +372,7 @@
             font_size: 30
             canvas.before:
                 Color:
-                    rgba: root.ui_color
+                    rgba: app.ui_color
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
@@ -385,11 +385,12 @@
             font_size: 30
             canvas.before:
                 Color:
-                    rgba: root.ui_color
+                    rgba: app.ui_color
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
                     radius: [30,]
+            disabled: root.reset_akt
             on_press: root.reset_button()
 
 
@@ -399,7 +400,7 @@
     font_size: 30
     canvas.before:
         Color:
-            rgba: root.ui_color
+            rgba: app.ui_color
         RoundedRectangle:
             pos: self.pos
             size: self.size
@@ -434,7 +435,7 @@
                 font_size: 40
                 canvas.before:
                     Color:
-                        rgba: root.ui_color
+                        rgba: app.ui_color
                     RoundedRectangle:
                         pos: self.pos
                         size: self.size
@@ -447,7 +448,7 @@
                 font_size: 40
                 canvas.before:
                     Color:
-                        rgba: root.ui_color
+                        rgba:app.ui_color
                     RoundedRectangle:
                         pos: self.pos
                         size: self.size
@@ -471,10 +472,10 @@
             size_hint: .7, .1
             pos_hint: {'center_x': .5}
             font_size: 40
-            cursor_color: root.ui_color
+            cursor_color: app.ui_color
             multiline: False
             background_color: (97/255, 97/255, 101/255, .6)
-            on_text: self.foreground_color = root.ui_color
+            on_text: self.foreground_color = app.ui_color
 
         Button:
             background_color: (0, 0, 0, 0)
@@ -484,7 +485,7 @@
             font_size: 25
             canvas.before:
                 Color:
-                    rgba: root.ui_color
+                    rgba: app.ui_color
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
@@ -501,7 +502,7 @@
             font_size: 25
             canvas.before:
                 Color:
-                    rgba: root.ui_color
+                    rgba: app.ui_color
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
